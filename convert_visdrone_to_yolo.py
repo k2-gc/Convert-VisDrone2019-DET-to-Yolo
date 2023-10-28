@@ -90,11 +90,11 @@ def convert_visdrone_to_yolo_format(
                 bbox_height = int(split_line[3])
                 bbox_center_x = bbox_left + int(bbox_width / 2)
                 bbox_center_y = bbox_top + int(bbox_height / 2)
-                absolute_x = bbox_center_x / image_width
-                absolute_y = bbox_center_y / image_height
-                absolute_width = bbox_width / image_width
-                absolute_height = bbox_height / image_height
-                print(f"{original_label_to_new_label[label]} {absolute_x} {absolute_y} {absolute_width} {absolute_height}", file=f)
+                relative_x = bbox_center_x / image_width
+                relative_y = bbox_center_y / image_height
+                relative_width = bbox_width / image_width
+                relative_height = bbox_height / image_height
+                print(f"{original_label_to_new_label[label]} {relative_x} {relative_y} {relative_width} {relative_height}", file=f)
 
 
 def get_parser():
