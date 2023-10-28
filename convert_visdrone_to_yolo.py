@@ -10,6 +10,28 @@ def create_path_object(dir_path):
 
     return dir_path
 
+def convert_coordinates(bbox, image_width, image_height):
+    """Convert coordinates from absolute topleft width height to relative center width height.
+    
+    Args:
+        bbox (list): Bbox info
+        image_width (int): Image width
+        image_height (int): Image height
+    
+    Return:
+        bbox (list): Converted bbox
+    """
+    bbox_left = bbox[0]
+    bbox_top = bbox[1]
+    bbox_width = bbox[2]
+    bbox_height = bbox[3]
+    bbox_center_x = bbox_left + int(bbox_width / 2)
+    bbox_center_y = bbox_top + int(bbox_height / 2)
+    relative_x = bbox_center_x / image_width
+    relative_y = bbox_center_y / image_height
+    relative_width = bbox_width / image_width
+    relative_height = bbox_height / image_height
+    return [relative_x, relative_y, relative_width, relative_height]
 
 def convert_visdrone_to_yolo_format(
         annotation_dir_path: str,
@@ -84,17 +106,11 @@ def convert_visdrone_to_yolo_format(
                 label = split_line[5]
                 if label in ignore_label_list:
                     continue
-                bbox_left = int(split_line[0])
-                bbox_top = int(split_line[1])
-                bbox_width = int(split_line[2])
-                bbox_height = int(split_line[3])
-                bbox_center_x = bbox_left + int(bbox_width / 2)
-                bbox_center_y = bbox_top + int(bbox_height / 2)
-                relative_x = bbox_center_x / image_width
-                relative_y = bbox_center_y / image_height
-                relative_width = bbox_width / image_width
-                relative_height = bbox_height / image_height
-                print(f"{original_label_to_new_label[label]} {relative_x} {relative_y} {relative_width} {relative_height}", file=f)
+
+                bbox = [int(b) for b in split_line[:4]]
+                bbox = convert_coordinates(bbox, image_width, image_height)
+                bbox = [str(b) for b in bbox]
+                print(f"{original_label_to_new_label[label]} {' '.join(bbox)}", file=f)
 
 
 def get_parser():
